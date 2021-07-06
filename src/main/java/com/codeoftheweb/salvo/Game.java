@@ -40,4 +40,7 @@ public class Game {
         return gamePlayers;
     }
 
+    @OneToMany (fetch = FetchType.EAGER, mappedBy = "game")
+    private Set<Score> scores = new HashSet<>();
+
 }

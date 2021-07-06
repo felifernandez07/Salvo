@@ -5,6 +5,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Entity
@@ -41,6 +42,13 @@ public class Player {
     }
     public Set<GamePlayer> getGamePlayers() {
         return gamePlayers;
+    }
+
+    @OneToMany (fetch = FetchType.EAGER, mappedBy = "player")
+    private Set<Score> scores = new HashSet<>();
+
+    public Optional<Score> getScore(Game game){
+        return scores.stream().filter(score -> score.getGameId().equals(game.getId())).findFirst();
     }
 }
 

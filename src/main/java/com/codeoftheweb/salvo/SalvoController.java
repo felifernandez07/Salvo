@@ -42,6 +42,7 @@ public class SalvoController {
         dto.put("id", game.getId());
         dto.put("created", game.getDate());
         dto.put("gamePlayers", game.getGamePlayers().stream().map(gp-> makeGamePlayerDTO(gp)).collect(Collectors.toList()));
+        dto.put("scores", game.getGamePlayers().stream().map(gp -> makeScoreDTO(gp)).collect(Collectors.toList()));
         return dto;
     }
 
@@ -73,5 +74,18 @@ public class SalvoController {
         dto.put("locations",salvo.getSalvolocation());
         return dto;
     }
+
+    private Map<String, Object> makeScoreDTO(GamePlayer gamePlayer) {
+        Map<String, Object> dto = new LinkedHashMap<String, Object>();
+        if (gamePlayer.getScore().isPresent()) {
+            dto.put("player", gamePlayer.getPlayer().getId());
+            dto.put("score", gamePlayer.getScore().get().getScore());
+            dto.put("finishDate", gamePlayer.getScore().get().getDate());
+            return dto;
+        } else {
+            dto.put("score", "el juego no tiene puntaje");
+            return dto;
+        }
+}
 }
 
