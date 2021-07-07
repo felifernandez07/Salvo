@@ -20,9 +20,10 @@ public class SalvoController {
     private GamePlayerRepository GamePlayerRep;
 
     @RequestMapping("/games")
-    public List<Object> getGames() {
-        List<Game> lista = GameRep.findAll();
-        return lista.stream().map(listId -> makeGameDTO(listId)).collect(Collectors.toList());
+        public Map<String, Object> getGames() {
+        Map<String, Object> dto = new LinkedHashMap<>();
+        dto.put("games", GameRep.findAll().stream().map(f -> makeGameDTO(f)).collect(Collectors.toList()));
+        return dto;
     }
 
     @RequestMapping("/game_view/{x}")
@@ -33,8 +34,9 @@ public class SalvoController {
         m.put("ships",gpl.getShips().stream().map(barco->makeShipsDTO(barco)).collect(Collectors.toList()));
         m.put("salvoes", gpl.getGame().getGamePlayers().stream().flatMap((a) -> a.getSalvoes().stream().map(this::makeSalvoesDTO)));
         return m;
-
     }
+
+
 
 
     private Map<String, Object> makeGameDTO(Game game) {
