@@ -70,10 +70,6 @@ public class SalvoApplication {
 			ScoreRep.save(score1);
 			ScoreRep.save(score2);
 
-
-
-
-
 		};
 	}
 }

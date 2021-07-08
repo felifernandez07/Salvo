@@ -17,11 +17,9 @@ public class Player {
     @GenericGenerator(name= "native", strategy = "native")
 
     private long id;
-
     private String userName;
 
     public Player(){}
-
     public Player(String userName) {
         this.userName = userName;
     }
@@ -29,7 +27,6 @@ public class Player {
     public String getUserName() {
         return userName;
     }
-
     public void setUserName(String userName) {
         this.userName=userName;
     }

@@ -23,7 +23,6 @@ public class Ship {
     private List<String> shiplocation;
 
     public Ship(){}
-
     public Ship(String shipType, List<String> shipLocation, GamePlayer gp) {
         this.type = shipType;
         this.shiplocation = shipLocation;

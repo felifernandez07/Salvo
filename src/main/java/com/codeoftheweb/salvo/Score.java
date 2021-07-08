@@ -18,7 +18,6 @@ public class Score {
 
     public Score() {
     }
-
     public Score(double score, Date date, Player player, Game game) {
         this.score = score;
         this.date = date;
@@ -65,7 +64,6 @@ public class Score {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "game_id")
     private Game game;
-
 
     public Object getGameId() {
         return game.getId();

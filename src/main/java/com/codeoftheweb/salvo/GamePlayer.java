@@ -49,7 +49,6 @@ public class GamePlayer {
     }
 
     public GamePlayer(){}
-
     public GamePlayer(Date date, Player player, Game game) {
         this.date = date;
         this.player = player;
