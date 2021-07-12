@@ -17,18 +17,12 @@ public class Player {
     @GenericGenerator(name= "native", strategy = "native")
 
     private long id;
-    private String userName;
+
 
     public Player(){}
-    public Player(String userName) {
-        this.userName = userName;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-    public void setUserName(String userName) {
-        this.userName=userName;
+    public Player(String email, String password) {
+        this.email =email;
+        this.password = password;
     }
 
     @OneToMany (fetch = FetchType.EAGER, mappedBy = "player")
@@ -46,6 +40,24 @@ public class Player {
 
     public Optional<Score> getScore(Game game){
         return scores.stream().filter(score -> score.getGameId().equals(game.getId())).findFirst();
+    }
+
+    private String password;
+
+    public String getPassword() {
+        return password;
+    }
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    private String email;
+
+    public String getEmail() {
+        return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
     }
 }
 
