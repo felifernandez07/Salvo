@@ -125,7 +125,9 @@ class WebSecurityConfiguration extends GlobalAuthenticationConfigurerAdapter {
 			http.authorizeRequests()
 					.antMatchers("/web/**","/h2-console/**","/api/games").permitAll()
 					.antMatchers(HttpMethod.POST, "/api/players").permitAll()
-					.antMatchers("/").hasAuthority("USER")
+					.antMatchers(HttpMethod.POST, "/api/game_view/**").permitAll()
+					.antMatchers(HttpMethod.POST, "/api/game/{gameID}/players").permitAll()
+					.antMatchers("/**").hasAuthority("USER")
 					.antMatchers("/h2-console/**").permitAll().anyRequest().authenticated()
 					.and().csrf().ignoringAntMatchers("/h2-console/**")
 					.and().headers().frameOptions().sameOrigin();
