@@ -3,11 +3,7 @@ package com.codeoftheweb.salvo;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import javax.xml.stream.Location;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 @Entity
 public class Ship {
@@ -20,12 +16,12 @@ public class Ship {
 
     @ElementCollection
     @Column(name = "Location")
-    private List<String> shiplocation;
+    private List<String> shipLocations;
 
     public Ship(){}
     public Ship(String shipType, List<String> shipLocation, GamePlayer gp) {
         this.type = shipType;
-        this.shiplocation = shipLocation;
+        this.shipLocations = shipLocation;
         this.gamePlayer= gp;
     }
 
@@ -43,11 +39,11 @@ public class Ship {
         this.type = type;
     }
 
-    public List<String>getShiplocation() {
-        return shiplocation;
+    public List<String> getShipLocations() {
+        return shipLocations;
     }
-    public void setShiplocation(List<String> shiplocation) {
-        this.shiplocation = shiplocation;
+    public void setShipLocations(List<String> shipLocations) {
+        this.shipLocations = shipLocations;
     }
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -61,4 +57,6 @@ public class Ship {
     public void setGamePlayer(GamePlayer gamePlayer) {
         this.gamePlayer = gamePlayer;
     }
+
+
 }

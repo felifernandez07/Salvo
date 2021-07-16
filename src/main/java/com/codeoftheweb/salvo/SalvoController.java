@@ -7,9 +7,7 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.yaml.snakeyaml.events.Event;
 
-import javax.persistence.Id;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,6 +23,9 @@ public class SalvoController {
     private PlayerRepository playerRep;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private ShipRepository shipRep;
+
 
   /*@PostMapping("/players")
     public void addPlayer(@RequestBody Player player) { playerService.savePlayer(player); }
@@ -105,7 +106,7 @@ public class SalvoController {
     private Map<String, Object> makeShipsDTO(Ship ship) {
         Map<String, Object> dto = new LinkedHashMap<String, Object>();
         dto.put("type", ship.getType());
-        dto.put("locations", ship.getShiplocation());
+        dto.put("locations", ship.getShipLocations());
         return dto;
     }
 
@@ -205,13 +206,33 @@ public class SalvoController {
         return map;
 }
 
+    @PostMapping("/games/players/{gamePlayerId}/ships")
+    public ResponseEntity<Map<String, Object>> placeShips (@PathVariable long gamePlayerId, @RequestBody List<Ship> ships,Authentication authentication) {
 
+        if (gamePlayerRep.findById(gamePlayerId).isPresent()){
+            GamePlayer gp = gamePlayerRep.findById(gamePlayerId).get();
+            if (!isGuest(authentication)){
+                Player pl = playerRep.findByEmail(authentication.getName());
+                if (gp.getPlayer().getId() == pl.getId()){
+                    if (gp.getShips().size()==0){
+                        if (ships.size() == 5) {
 
+                            ships.forEach(ship -> shipRep.save(new Ship(ship.getType(), ship.getShipLocations(), gp)));
+                            return new ResponseEntity<>(makeMap("OK", "ships successfully added"), HttpStatus.CREATED);
 
-
-
-
-
+                        } else if (ships.size()<5) {
+                            return new ResponseEntity<>(makeMap("error","you have to place five ships"), HttpStatus.FORBIDDEN);
+                        }
+                        return new ResponseEntity<>(makeMap("error","you cant place more than 5 ships"), HttpStatus.FORBIDDEN);
+                    }
+                    return new ResponseEntity<>(makeMap("error","you must place your 5 ships"), HttpStatus.FORBIDDEN);
+                }
+                return new ResponseEntity<>(makeMap("error","The player doesnt match with this game"), HttpStatus.UNAUTHORIZED);
+            }
+            return new ResponseEntity<>(makeMap("error","you have to log in"), HttpStatus.UNAUTHORIZED);
+        }
+        return new ResponseEntity<>(makeMap("error","match not found"), HttpStatus.UNAUTHORIZED);
+    }
 }
 
 

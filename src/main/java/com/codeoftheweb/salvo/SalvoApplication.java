@@ -123,10 +123,11 @@ class WebSecurityConfiguration extends GlobalAuthenticationConfigurerAdapter {
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
 			http.authorizeRequests()
-					.antMatchers("/web/**","/h2-console/**","/api/games").permitAll()
-					.antMatchers(HttpMethod.POST, "/api/players").permitAll()
+					.antMatchers("/web/**","/h2-console/**","/api/**").permitAll()
+					/*.antMatchers(HttpMethod.POST, "/api/players").permitAll()
 					.antMatchers(HttpMethod.POST, "/api/game_view/**").permitAll()
 					.antMatchers(HttpMethod.POST, "/api/game/{gameID}/players").permitAll()
+					.antMatchers(HttpMethod.POST, "/games/players/{gamePlayerId}/ships").permitAll()*/
 					.antMatchers("/**").hasAuthority("USER")
 					.antMatchers("/h2-console/**").permitAll().anyRequest().authenticated()
 					.and().csrf().ignoringAntMatchers("/h2-console/**")
