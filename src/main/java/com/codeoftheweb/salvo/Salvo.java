@@ -16,13 +16,13 @@ public class Salvo {
 
     @ElementCollection
     @Column(name = "Location")
-    private List<String> salvolocation;
+    private List<String> salvoLocations;
 
     public Salvo() {
     }
 
     public Salvo( List<String> salvolocation, int turn, GamePlayer gp) {
-        this.salvolocation = salvolocation;
+        this.salvoLocations = salvolocation;
         this.turn = turn;
         this.gamePlayer = gp;
     }
@@ -45,11 +45,11 @@ public class Salvo {
         this.turn = turn;
     }
 
-    public List<String> getSalvolocation() {
-        return salvolocation;
+    public List<String> getSalvoLocations() {
+        return salvoLocations;
     }
-    public void setSalvolocation(List<String> salvolocation) {
-        this.salvolocation = salvolocation;
+    public void setSalvoLocations(List<String> salvoLocations) {
+        this.salvoLocations = salvoLocations;
     }
 
     public GamePlayer getGamePlayer() {

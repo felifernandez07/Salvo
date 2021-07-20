@@ -25,6 +25,8 @@ public class SalvoController {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private ShipRepository shipRep;
+    @Autowired
+    private SalvoRepository salvoRep;
 
 
   /*@PostMapping("/players")
@@ -55,19 +57,12 @@ public class SalvoController {
             return new ResponseEntity<>(makeMap("error","cheater"),HttpStatus.UNAUTHORIZED);
         }
         else {
-            Map<String, Object> m = makeGameDTOAux(game);
+            Map<String, Object> m = makeGameAuxDTO(game);
             m.put("ships", gpl.getShips().stream().map(barco -> makeShipsDTO(barco)).collect(Collectors.toList()));
             m.put("salvoes", gpl.getGame().getGamePlayers().stream().flatMap((a) -> a.getSalvoes().stream().map(this::makeSalvoesDTO)));
             m.put("hits", makeHitsDTO());
             return new ResponseEntity<>(m,HttpStatus.CREATED);
         }
-    }
-
-    private Map<String, Object> makeHitsDTO() {
-        Map<String, Object> dto = new LinkedHashMap<String, Object>();
-        dto.put ("self",new ArrayList<>()) ;
-        dto.put("opponent",new ArrayList<>());
-        return dto;
     }
 
     private Map<String, Object> makeGameDTO(Game game) {
@@ -79,7 +74,7 @@ public class SalvoController {
         return dto;
     }
 
-    private Map<String, Object> makeGameDTOAux(Game game){
+    private Map<String, Object> makeGameAuxDTO(Game game){
         Map<String, Object> dto = new LinkedHashMap<String, Object>();
         dto.put("id", game.getId());
         dto.put("created", game.getDate());
@@ -114,7 +109,7 @@ public class SalvoController {
         Map<String, Object> dto = new LinkedHashMap<String, Object>();
         dto.put("turn", salvo.getTurn());
         dto.put("player", salvo.getGamePlayer().getPlayer().getId());
-        dto.put("locations", salvo.getSalvolocation());
+        dto.put("locations", salvo.getSalvoLocations());
         return dto;
     }
 
@@ -129,6 +124,13 @@ public class SalvoController {
             dto.put("score", "el juego no tiene puntaje");
             return dto;
         }
+    }
+
+    private Map<String, Object> makeHitsDTO() {
+        Map<String, Object> dto = new LinkedHashMap<String, Object>();
+        dto.put ("self",new ArrayList<>()) ;
+        dto.put("opponent",new ArrayList<>());
+        return dto;
     }
 
     @RequestMapping(path = "/players", method = RequestMethod.POST)
@@ -225,7 +227,7 @@ public class SalvoController {
                         }
                         return new ResponseEntity<>(makeMap("error","you cant place more than 5 ships"), HttpStatus.FORBIDDEN);
                     }
-                    return new ResponseEntity<>(makeMap("error","you must place your 5 ships"), HttpStatus.FORBIDDEN);
+                    return new ResponseEntity<>(makeMap("error","you cant place your ships again"), HttpStatus.FORBIDDEN);
                 }
                 return new ResponseEntity<>(makeMap("error","The player doesnt match with this game"), HttpStatus.UNAUTHORIZED);
             }
@@ -233,6 +235,56 @@ public class SalvoController {
         }
         return new ResponseEntity<>(makeMap("error","match not found"), HttpStatus.UNAUTHORIZED);
     }
+
+   /* @PostMapping("/games/players/{gamePlayerId}/salvoes")
+    public ResponseEntity<Map<String, Object>> StoreSalvoes (@PathVariable long gamePlayerId, @RequestBody Salvo salvos,Authentication authentication) {
+
+        if (gamePlayerRep.findById(gamePlayerId).isPresent()){
+            GamePlayer gp = gamePlayerRep.findById(gamePlayerId).get();
+            if (!isGuest(authentication)){
+                Player pl = playerRep.findByEmail(authentication.getName());
+                if (gp.getPlayer().getId() == pl.getId()){
+                    if (gp.getSalvoes().size()<6){
+
+                            salvos.forEach(salvo -> salvoRep.save(new Salvo(salvo.getSalvoLocations(),salvo.getTurn(), gp)));
+                            return new ResponseEntity<>(makeMap("OK", "salvoes successfully added"), HttpStatus.CREATED);
+
+                        } else if (salvos.size()>5) {
+                            return new ResponseEntity<>(makeMap("error","only you can place a max of five salvoes"), HttpStatus.FORBIDDEN);
+                        }
+                        return new ResponseEntity<>(makeMap("error","you cant place more than 5 salvoes"), HttpStatus.FORBIDDEN);
+                }
+                return new ResponseEntity<>(makeMap("error","The player doesnt match with this game"), HttpStatus.UNAUTHORIZED);
+            }
+            return new ResponseEntity<>(makeMap("error","you must log in"), HttpStatus.UNAUTHORIZED);
+        }
+        return new ResponseEntity<>(makeMap("error","match not found"), HttpStatus.UNAUTHORIZED); }*/
+
+
+@PostMapping("/games/players/{gamePlayerId}/salvoes")
+public ResponseEntity<Map<String, Object>> StoreSalvoes (@PathVariable long gamePlayerId, @RequestBody Salvo salvos,Authentication authentication) {
+
+GamePlayer gamePlayer= gamePlayerRep.getById(gamePlayerId);
+Player player = playerRep.findByEmail(authentication.getName());
+if (isGuest(authentication)) {
+    return new ResponseEntity<>(makeMap("Error", "You must log in"), HttpStatus.UNAUTHORIZED);
+}
+if (gamePlayer.getPlayer().getId()!= player.getId()) {
+    return new ResponseEntity<>(makeMap("Error", "You dont belong here"), HttpStatus.UNAUTHORIZED);
+}
+if (gamePlayer.getSalvoes().size()!=0) {
+    return new ResponseEntity<>(makeMap("Error", "You already fired"), HttpStatus.FORBIDDEN);
+}
+if (gamePlayer.getSalvoes().size()>5 || gamePlayer.getSalvoes().size()<=0) {
+    return new ResponseEntity<>(makeMap("Eror","You have to submit a salvo and a max of 5"),HttpStatus.FORBIDDEN);
+}
+if (gamePlayer.getSalvoes().size()<= gamePlayer.getOpponent().get().getSalvoes().size()) {
+   salvoRep.save(new Salvo(salvos.getSalvoLocations(), salvos.getTurn(), salvos.getGamePlayer()));
+   return new ResponseEntity<>(HttpStatus.CREATED);
+}
+return new ResponseEntity<>(makeMap("Error","You already submitted a salvo"), HttpStatus.FORBIDDEN);
+
+}
 }
 
 
