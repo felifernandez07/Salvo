@@ -4,6 +4,7 @@ import com.codeoftheweb.salvo.Classes.Game;
 import com.codeoftheweb.salvo.Classes.GamePlayer;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -23,11 +24,19 @@ public class GameAuxDTO {
     public GameAuxDTO(Game game, GamePlayer gpl) {
         this.id = game.getId();
         this.created = game.getDate();
-        this.gameState = "PLACESHIPS";
+        this.gameState = "PLAY";
         this.gamePlayers = game.getGamePlayers().stream().map(g->new GamePlayerDTO(g)).collect(Collectors.toSet());
         this.ships= gpl.getShips().stream().map(barco -> new ShipsDTO(barco)).collect(Collectors.toSet());
-        this.salvoes= gpl.getGame().getGamePlayers().stream().flatMap((a) -> a.getSalvoes().stream().map(s-> new SalvoDTO(s))).collect(Collectors.toSet());
-        this.hits= new HitsDTO();
+        if (gpl.getOpponentPlayer().isPresent()){
+            this.salvoes= gpl.getGame().getGamePlayers()
+                    .stream()
+                    .flatMap((a) -> a.getSalvoes().stream())
+                    .map(s-> new SalvoDTO(s))
+                    .collect(Collectors.toSet());
+        }else {
+            this.salvoes= new HashSet<>();
+        }
+        this.hits= new HitsDTO(gpl);
     }
 
     public Long getId() {

@@ -67,22 +67,35 @@ public class SalvoApplication {
 			GamePlayer gp2 = new GamePlayer(new Date(), player2, game1);
 			GamePlayerRep.save(gp2);
 
-			Ship ship1 = new Ship("cruiser", List.of("H1", "H2", "H3", "H4"), gp1);
+			Ship ship1 = new Ship("destroyer", List.of("H2", "H3", "H4"),gp1);
+			Ship ship2 = new Ship( "submarine", List.of("E1", "F1", "G1"),gp1);
+			Ship ship3 = new Ship( "patrolboat", List.of("B5", "B4"),gp1);
+			Ship ship6 = new Ship( "carrier", List.of("J1", "J2", "J3", "J4", "J5"),gp1);
+			Ship ship7 = new Ship( "battleship", List.of("A5", "A6", "A7", "A8"),gp1);
+			Ship ship4 = new Ship("destroyer", List.of("B5", "C5", "D5"),gp2);
+			Ship ship5 = new Ship( "patrolboat", List.of("F1", "F2"),gp2);
+			Ship ship8 = new Ship("submarine", List.of("J1", "J2", "J3"),gp2);
+			Ship ship9 = new Ship( "battleship", List.of("A1", "A2", "A3", "A4"),gp2);
+			Ship ship10 = new Ship( "carrier", List.of("G1", "G2", "G3", "G4", "G5"),gp2);
+
 			ShipRep.save(ship1);
-
-			Ship ship2 = new Ship("patrol_boat", List.of("A1", "A2"), gp1);
 			ShipRep.save(ship2);
-
-			Ship ship3 = new Ship("submarine", List.of("B1", "C1", "D1"), gp2);
 			ShipRep.save(ship3);
+			ShipRep.save(ship4);
+			ShipRep.save(ship5);
+			ShipRep.save(ship6);
+			ShipRep.save(ship7);
+			ShipRep.save(ship8);
+			ShipRep.save(ship9);
+			ShipRep.save(ship10);
 
 			Salvo salvo1 = new Salvo(List.of("H1", "H2", "H3", "H4"), 1, gp1);
 			Salvo salvo2 = new Salvo(List.of("A1", "B1", "C1", "D1"), 2, gp1);
 			Salvo salvo3 = new Salvo(List.of("A1", "A2", "A3", "A4"), 1, gp2);
 
-			SalvoRep.save(salvo1);
+			/*SalvoRep.save(salvo1);
 			SalvoRep.save(salvo2);
-			SalvoRep.save(salvo3);
+			SalvoRep.save(salvo3);*/
 
 			Score score1 = new Score(1, new Date(), player1, game1);
 			Score score2 = new Score(0, new Date(), player2, game1);

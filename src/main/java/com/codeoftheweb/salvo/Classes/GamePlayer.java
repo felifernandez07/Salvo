@@ -84,7 +84,7 @@ public class GamePlayer {
         return player.getScore(game);
     }
 
-    public Optional<GamePlayer> getOpponent(){
+    public Optional<GamePlayer> getOpponentPlayer(){
         return this.getGame().getGamePlayers().stream().filter(gp -> gp.getId() != this.getId()).findFirst();
     }
 
