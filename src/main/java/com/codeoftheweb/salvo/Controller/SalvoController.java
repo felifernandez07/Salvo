@@ -31,6 +31,8 @@ public class SalvoController {
     private ShipRepository shipRep;
     @Autowired
     private SalvoRepository salvoRep;
+    @Autowired
+    private ScoreRepository scoreRepository;
 
 
     @GetMapping("/games")
@@ -54,7 +56,17 @@ public class SalvoController {
         if (gpl.getPlayer().getId() != player.getId()) {
             return new ResponseEntity<>(makeMap("error", "cheater"), HttpStatus.UNAUTHORIZED);
         } else {
-            return new ResponseEntity<>(new GameAuxDTO(game, gpl), HttpStatus.CREATED);
+            GameAuxDTO gameAux = new GameAuxDTO(game, gpl);
+            if (gameAux.getGameState()=="WON"){
+                scoreRepository.save(new Score(1, new Date(),gpl.getPlayer(),gpl.getGame()));
+            }
+            if (gameAux.getGameState()=="LOST"){
+                scoreRepository.save(new Score(0, new Date(),gpl.getPlayer(),gpl.getGame()));
+            }
+            if (gameAux.getGameState()=="TIE"){
+                scoreRepository.save(new Score(0.5, new Date(),gpl.getPlayer(),gpl.getGame()));
+            }
+            return new ResponseEntity<>(gameAux, HttpStatus.CREATED);
         }
     }
 
@@ -100,7 +112,7 @@ public class SalvoController {
     public ResponseEntity<Map<String, Object>> joinGame(@PathVariable long gameID, Authentication authentication) {
 
         Date joinDate = new Date();
-        Game game = gameRep.getById(gameID);
+        Game game = gameRep.findById(gameID).get();
 
         if (!isGuest(authentication)) {
             if (game != null) {
@@ -162,7 +174,7 @@ public class SalvoController {
     @PostMapping("/games/players/{gamePlayerId}/salvoes")
     public ResponseEntity<Map<String, Object>> StoreSalvoes(@PathVariable long gamePlayerId, @RequestBody Salvo salvos, Authentication authentication) {
 
-        GamePlayer gamePlayer = gamePlayerRep.getById(gamePlayerId);
+        GamePlayer gamePlayer = gamePlayerRep.findById(gamePlayerId).get();
         Player player = playerRep.findByEmail(authentication.getName());
 
         Optional<GamePlayer> opponent = gamePlayer.getOpponentPlayer();
@@ -187,8 +199,8 @@ public class SalvoController {
 
         salvoRep.save(new Salvo(salvos.getSalvoLocations(), gamePlayer.getSalvoes().size() + 1, gamePlayer));
         return new ResponseEntity<>(makeMap("OK","salvo created"),HttpStatus.CREATED);
-
     }
+
 
 
 }

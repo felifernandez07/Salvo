@@ -2,9 +2,11 @@ package com.codeoftheweb.salvo.DTOs;
 
 import com.codeoftheweb.salvo.Classes.Game;
 import com.codeoftheweb.salvo.Classes.GamePlayer;
+import com.codeoftheweb.salvo.Classes.Salvo;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -18,13 +20,14 @@ public class GameAuxDTO {
     private Set<SalvoDTO>salvoes;
     private HitsDTO hits;
 
+
     public GameAuxDTO() {
     }
 
     public GameAuxDTO(Game game, GamePlayer gpl) {
         this.id = game.getId();
         this.created = game.getDate();
-        this.gameState = "PLAY";
+        this.gameState = makeStates(gpl);   //
         this.gamePlayers = game.getGamePlayers().stream().map(g->new GamePlayerDTO(g)).collect(Collectors.toSet());
         this.ships= gpl.getShips().stream().map(barco -> new ShipsDTO(barco)).collect(Collectors.toSet());
         if (gpl.getOpponentPlayer().isPresent()){
@@ -37,6 +40,43 @@ public class GameAuxDTO {
             this.salvoes= new HashSet<>();
         }
         this.hits= new HitsDTO(gpl);
+    }
+
+    public String makeStates (GamePlayer gamePlayer) {
+        if (gamePlayer.getShips().size() < 5) {
+            return "PLACESHIPS";
+        }
+        if (gamePlayer.getOpponentPlayer().isEmpty() || gamePlayer.getOpponentPlayer().get().getShips().size()<5){
+            return "WAITINGFOROPP";
+        }
+        if (fullHits(gamePlayer)==17 && fullHits(gamePlayer.getOpponentPlayer().get())==17 &&  gamePlayer.getSalvoes().size()==gamePlayer.getOpponentPlayer().get().getSalvoes().size()){
+                return "TIE";
+
+        }
+        if (fullHits(gamePlayer)==17 && fullHits(gamePlayer)>fullHits(gamePlayer.getOpponentPlayer().get()) &&  gamePlayer.getSalvoes().size()==gamePlayer.getOpponentPlayer().get().getSalvoes().size() ){
+            return "WON";
+        }
+        if (fullHits(gamePlayer.getOpponentPlayer().get())==17 && fullHits(gamePlayer)<fullHits(gamePlayer.getOpponentPlayer().get()) && gamePlayer.getSalvoes().size()==gamePlayer.getOpponentPlayer().get().getSalvoes().size()){
+            return "LOST";
+        }
+        if (gamePlayer.getSalvoes().size()<= gamePlayer.getOpponentPlayer().get().getSalvoes().size()){
+            return "PLAY";
+        }
+        if ((gamePlayer.getSalvoes().size() > gamePlayer.getOpponentPlayer().get().getSalvoes().size())){
+            return "WAIT";
+        }
+        return "UNDEFINED";
+    }
+
+    public int fullHits (GamePlayer gamePlayer){
+        return gamePlayer.getSalvoes().stream().flatMap(f -> getHitLocations(f).stream()).collect(Collectors.toList()).size();
+    }
+
+    private List<String> getHitLocations(Salvo salvo) {
+        GamePlayer opponent = salvo.getGamePlayer().getOpponentPlayer().get();
+        List<String> loca = opponent.getShips().stream().flatMap(f -> f.getShipLocations().stream()).collect(Collectors.toList());
+        List<String> hits = loca.stream().filter(x -> salvo.getSalvoLocations().contains(x)).collect(Collectors.toList());
+        return hits;
     }
 
     public Long getId() {
